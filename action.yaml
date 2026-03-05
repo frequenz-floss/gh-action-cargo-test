@@ -44,7 +44,7 @@ runs:
     # If coverage is enabled, install cargo-llvm-cov.
     - name: Install dependencies for coverage
       if: inputs.enable-coverage == 'true' && steps.cache-bin.outputs.cache-hit != 'true'
-      run: cargo install --force cargo-llvm-cov
+      run: cargo install --force --locked cargo-llvm-cov
       shell: bash
 
     # Cache the test-build to speed up the build process.
