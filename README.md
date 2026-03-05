@@ -9,6 +9,16 @@ following:
 - linting using `cargo clippy`
 - tests using `cargo test`, or `cargo llvm-cov test` if coverage is enabled.
 
+## Security warning
+
+`cargo clippy` compiles the project and executes `build.rs` build scripts and
+procedural macros. `cargo test` additionally executes compiled test binaries.
+These commands run arbitrary Rust code from the checked-out repository.
+
+Do not use this action with untrusted code, for example in
+`pull_request_target` workflows that check out pull request code from forks.
+Use only trusted code contexts.
+
 ## Inputs
 
 Note that the build-cache generated in previous runs of this action becomes
@@ -69,4 +79,3 @@ jobs:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 for details.
-
