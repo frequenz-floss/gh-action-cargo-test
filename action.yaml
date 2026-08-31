@@ -29,7 +29,7 @@ runs:
     # Cache test-dependencies to speed up installing them.
     - name: Cache dependencies
       id: cache-bin
-      uses: actions/cache@v4
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
       with:
         path: ~/.cargo/bin
         key: ${{ runner.os }}-cargo-test-dependencies
@@ -44,14 +44,14 @@ runs:
     # If coverage is enabled, install cargo-llvm-cov.
     - name: Install dependencies for coverage
       if: inputs.enable-coverage == 'true' && steps.cache-bin.outputs.cache-hit != 'true'
-      run: cargo install --force cargo-llvm-cov
+      run: cargo install --force --locked cargo-llvm-cov
       shell: bash
 
     # Cache the test-build to speed up the build process.
     # Use the `Cargo.lock` file to generate a unique key for the cache.
     # If the `Cargo.lock` file does not exist, use the `Cargo.toml` file.
     - name: Cache build
-      uses: actions/cache@v4
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
       if: inputs.enable-build-cache == 'true'
       with:
         path: |
@@ -66,6 +66,10 @@ runs:
 
     # Run the linter.
     # -D warnings: enable all warnings
+    # SECURITY: `cargo clippy` compiles the workspace and executes `build.rs`
+    # scripts and procedural macros from the checked-out repository.
+    # Do not run this action on untrusted code (for example,
+    # `pull_request_target` + checkout of pull request code from forks).
     - name: Run clippy
       env:
         CLIPPY_PARAMETERS: ${{ inputs.cargo-clippy-extra-parameters }}
@@ -82,6 +86,10 @@ runs:
     # Read more about coverage in cargo here:
     # - https://doc.rust-lang.org/rustc/instrument-coverage.html#test-coverage
     # - https://lib.rs/crates/cargo-llvm-cov
+    # SECURITY: `cargo test` executes compiled test binaries and can run
+    # arbitrary code from the checked-out repository.
+    # Do not run this action on untrusted code (for example,
+    # `pull_request_target` + checkout of pull request code from forks).
     - name: Run tests
       env:
         ENABLE_COV: ${{ inputs.enable-coverage }}
